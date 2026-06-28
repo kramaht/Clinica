@@ -1,0 +1,60 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Especialidades{% endblock %}
+{% block page_title %}<i class="bi bi-award me-2 text-success"></i>Especialidades{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-0">
+        <table class="table table-clinic mb-0">
+          <thead><tr><th>Especialidad</th><th>Descripción</th><th>Médicos</th><th>Estado</th><th></th></tr></thead>
+          <tbody>
+            {% for e in especialidades %}
+            <tr>
+              <td class="fw-semibold small">{{ e.nombre }}</td>
+              <td class="small text-muted">{{ e.descripcion or '—' }}</td>
+              <td class="small">{{ e.medicos.count() }}</td>
+              <td>
+                <span class="badge {{ 'bg-success' if e.activa else 'bg-secondary' }} bg-opacity-15
+                             {{ 'text-success' if e.activa else 'text-secondary' }}">
+                  {{ 'Activa' if e.activa else 'Inactiva' }}
+                </span>
+              </td>
+              <td>
+                <a href="{{ url_for('admin.toggle_especialidad', id=e.id) }}"
+                   class="btn btn-sm {{ 'btn-outline-danger' if e.activa else 'btn-outline-success' }}">
+                  {{ 'Desactivar' if e.activa else 'Activar' }}
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-0 py-3">
+        <h6 class="mb-0 fw-bold">Nueva especialidad</h6>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('admin.crear_especialidad') }}">
+          <div class="mb-2">
+            <label class="form-label">Nombre *</label>
+            <input type="text" name="nombre" class="form-control form-control-sm" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea name="descripcion" class="form-control form-control-sm" rows="2"></textarea>
+          </div>
+          <button type="submit" class="btn btn-clinic-primary w-100 btn-sm py-2">
+            <i class="bi bi-plus-circle me-1"></i>Agregar
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

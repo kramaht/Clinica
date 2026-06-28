@@ -1,0 +1,64 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Medicamentos{% endblock %}
+{% block page_title %}<i class="bi bi-capsule me-2 text-danger"></i>Medicamentos{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-0">
+        <table class="table table-clinic mb-0">
+          <thead><tr><th>Medicamento</th><th>Principio activo</th><th>Presentación</th><th>Estado</th><th></th></tr></thead>
+          <tbody>
+            {% for m in medicamentos %}
+            <tr>
+              <td class="fw-semibold small">{{ m.nombre }}</td>
+              <td class="small text-muted">{{ m.principio_activo or '—' }}</td>
+              <td class="small">{{ m.presentacion or '—' }}</td>
+              <td>
+                <span class="badge {{ 'bg-success' if m.activo else 'bg-secondary' }} bg-opacity-15
+                             {{ 'text-success' if m.activo else 'text-secondary' }}">
+                  {{ 'Activo' if m.activo else 'Inactivo' }}
+                </span>
+              </td>
+              <td>
+                <a href="{{ url_for('admin.toggle_medicamento', id=m.id) }}"
+                   class="btn btn-sm {{ 'btn-outline-danger' if m.activo else 'btn-outline-success' }}">
+                  {{ 'Desactivar' if m.activo else 'Activar' }}
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-0 py-3">
+        <h6 class="mb-0 fw-bold">Nuevo medicamento</h6>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('admin.crear_medicamento') }}">
+          <div class="mb-2">
+            <label class="form-label">Nombre comercial *</label>
+            <input type="text" name="nombre" class="form-control form-control-sm" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Principio activo</label>
+            <input type="text" name="principio_activo" class="form-control form-control-sm">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Presentación</label>
+            <input type="text" name="presentacion" class="form-control form-control-sm" placeholder="Tab 500mg, Jarabe 250mg/5ml…">
+          </div>
+          <button type="submit" class="btn btn-clinic-primary w-100 btn-sm py-2">
+            <i class="bi bi-plus-circle me-1"></i>Agregar
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

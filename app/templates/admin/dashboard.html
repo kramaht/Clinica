@@ -1,0 +1,118 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}<i class="bi bi-grid-1x2 me-2 text-primary"></i>Dashboard{% endblock %}
+
+{% block content %}
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card bg-white shadow-sm">
+      <div class="icon-box" style="background:#e8f4ff;">
+        <i class="bi bi-people-fill text-primary"></i>
+      </div>
+      <div>
+        <div class="stat-num text-primary">{{ stats.pacientes }}</div>
+        <div class="stat-lbl">Pacientes activos</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card bg-white shadow-sm">
+      <div class="icon-box" style="background:#e6f9f6;">
+        <i class="bi bi-person-badge-fill" style="color:#0d9488;"></i>
+      </div>
+      <div>
+        <div class="stat-num" style="color:#0d9488;">{{ stats.medicos }}</div>
+        <div class="stat-lbl">Médicos activos</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card bg-white shadow-sm">
+      <div class="icon-box" style="background:#fff7e6;">
+        <i class="bi bi-calendar2-check-fill text-warning"></i>
+      </div>
+      <div>
+        <div class="stat-num text-warning">{{ stats.citas_hoy }}</div>
+        <div class="stat-lbl">Citas de hoy</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card bg-white shadow-sm">
+      <div class="icon-box" style="background:#f3e8ff;">
+        <i class="bi bi-clipboard2-pulse-fill text-purple" style="color:#7c3aed;"></i>
+      </div>
+      <div>
+        <div class="stat-num" style="color:#7c3aed;">{{ stats.consultas_mes }}</div>
+        <div class="stat-lbl">Consultas este mes</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <!-- Citas recientes -->
+  <div class="col-xl-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-calendar2 me-2 text-primary"></i>Citas recientes</h6>
+        <a href="{{ url_for('citas.index') }}" class="btn btn-sm btn-outline-primary">Ver todas</a>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-clinic mb-0">
+          <thead>
+            <tr>
+              <th>Paciente</th>
+              <th>Médico</th>
+              <th>Fecha/Hora</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cita in citas_recientes %}
+            <tr>
+              <td>
+                <i class="bi bi-person-circle me-1 text-muted"></i>
+                {{ cita.paciente.nombre_completo }}
+              </td>
+              <td>Dr. {{ cita.medico.nombre_completo }}</td>
+              <td>
+                <span class="small">{{ cita.fecha_hora.strftime('%d/%m/%Y') }}</span>
+                <span class="badge bg-light text-dark ms-1">{{ cita.fecha_hora.strftime('%H:%M') }}</span>
+              </td>
+              <td>
+                <span class="badge bg-{{ cita.badge_color }} bg-opacity-15 text-{{ cita.badge_color }}">
+                  {{ cita.estado | capitalize }}
+                </span>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-center text-muted py-4">No hay citas registradas.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Especialidades -->
+  <div class="col-xl-4">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white border-0 py-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-award me-2 text-success"></i>Médicos por especialidad</h6>
+      </div>
+      <div class="card-body">
+        {% for esp in especialidades_stats %}
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="small fw-semibold">{{ esp.nombre }}</span>
+          <span class="badge bg-primary bg-opacity-15 text-primary">{{ esp.total }} médico{{ 's' if esp.total != 1 }}</span>
+        </div>
+        {% else %}
+        <p class="text-muted small text-center mt-3">Sin datos aún.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

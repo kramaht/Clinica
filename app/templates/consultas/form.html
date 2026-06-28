@@ -1,0 +1,174 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Nueva Consulta{% endblock %}
+{% block page_title %}<i class="bi bi-clipboard2-plus me-2" style="color:#7c3aed;"></i>Nueva Consulta{% endblock %}
+
+{% block content %}
+<form method="POST">
+<div class="row g-3">
+  <!-- Columna izquierda -->
+  <div class="col-lg-8">
+    <!-- Datos básicos -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-white border-0 py-3">
+        <h6 class="mb-0 fw-bold">Datos de la consulta</h6>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Paciente *</label>
+            <select name="paciente_id" class="form-select" required>
+              <option value="">Seleccionar…</option>
+              {% for p in pacientes %}
+              <option value="{{ p.id }}">{{ p.nombre_completo }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Médico *</label>
+            <select name="medico_id" class="form-select" required>
+              <option value="">Seleccionar…</option>
+              {% for m in medicos %}
+              <option value="{{ m.id }}">Dr. {{ m.nombre_completo }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Vincular a cita (opcional)</label>
+            <select name="cita_id" class="form-select">
+              <option value="">Sin cita vinculada</option>
+              {% for c in citas_pendientes %}
+              <option value="{{ c.id }}">
+                #{{ c.id }} — {{ c.paciente.nombre_completo }} — {{ c.fecha_hora.strftime('%d/%m/%Y %H:%M') }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Motivo de consulta *</label>
+            <textarea name="motivo_consulta" class="form-control" rows="2" required></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Síntomas</label>
+            <textarea name="sintomas" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Diagnóstico *</label>
+            <textarea name="diagnostico" class="form-control" rows="2" required></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Tratamiento</label>
+            <textarea name="tratamiento" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Observaciones</label>
+            <textarea name="observaciones" class="form-control" rows="2"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recetas -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-capsule me-2 text-danger"></i>Recetas médicas</h6>
+        <button type="button" class="btn btn-sm btn-outline-success" id="addReceta">
+          <i class="bi bi-plus-circle me-1"></i>Agregar medicamento
+        </button>
+      </div>
+      <div class="card-body" id="recetasContainer">
+        <!-- filas dinámicas -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Columna derecha: signos vitales -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-0 py-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-heart-pulse me-2 text-danger"></i>Signos vitales</h6>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label class="form-label">Peso (kg)</label>
+          <input type="number" step="0.1" name="peso" class="form-control" placeholder="70.5">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Talla (cm)</label>
+          <input type="number" step="0.1" name="talla" class="form-control" placeholder="175">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Presión arterial</label>
+          <input type="text" name="presion_arterial" class="form-control" placeholder="120/80">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Temperatura (°C)</label>
+          <input type="number" step="0.1" name="temperatura" class="form-control" placeholder="36.5">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Frec. cardíaca (lpm)</label>
+          <input type="number" name="frecuencia_cardiaca" class="form-control" placeholder="72">
+        </div>
+      </div>
+    </div>
+
+    <div class="d-grid mt-3">
+      <button type="submit" class="btn btn-clinic-primary py-2">
+        <i class="bi bi-floppy me-2"></i>Guardar consulta
+      </button>
+      <a href="{{ url_for('consultas.index') }}" class="btn btn-light mt-2">Cancelar</a>
+    </div>
+  </div>
+</div>
+</form>
+
+<!-- Template fila receta -->
+<template id="recetaTemplate">
+  <div class="border rounded-3 p-3 mb-2 receta-row">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label small">Medicamento</label>
+        <select name="medicamento_id[]" class="form-select form-select-sm">
+          <option value="">Seleccionar…</option>
+          {% for med in medicamentos %}
+          <option value="{{ med.id }}">{{ med.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Dosis</label>
+        <input type="text" name="dosis[]" class="form-control form-control-sm" placeholder="500mg">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Frecuencia</label>
+        <input type="text" name="frecuencia[]" class="form-control form-control-sm" placeholder="Cada 8h">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Duración</label>
+        <input type="text" name="duracion[]" class="form-control form-control-sm" placeholder="7 días">
+      </div>
+      <div class="col-md-1 text-end">
+        <button type="button" class="btn btn-sm btn-outline-danger remove-receta"><i class="bi bi-trash"></i></button>
+      </div>
+      <div class="col-12">
+        <input type="text" name="indicaciones[]" class="form-control form-control-sm" placeholder="Indicaciones adicionales…">
+      </div>
+    </div>
+  </div>
+</template>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.getElementById('addReceta').addEventListener('click', () => {
+    const t = document.getElementById('recetaTemplate');
+    const clone = t.content.cloneNode(true);
+    document.getElementById('recetasContainer').appendChild(clone);
+  });
+  document.getElementById('recetasContainer').addEventListener('click', e => {
+    if (e.target.closest('.remove-receta')) {
+      e.target.closest('.receta-row').remove();
+    }
+  });
+</script>
+{% endblock %}

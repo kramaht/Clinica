@@ -1,0 +1,50 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Consultas{% endblock %}
+{% block page_title %}<i class="bi bi-clipboard2-pulse me-2" style="color:#7c3aed;"></i>Consultas médicas{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <form class="d-flex gap-2">
+    <input type="search" name="q" value="{{ q }}" class="form-control form-control-sm"
+           placeholder="Buscar paciente…" style="width:240px;">
+    <button class="btn btn-sm btn-outline-secondary">Buscar</button>
+  </form>
+  <a href="{{ url_for('consultas.nueva') }}" class="btn btn-clinic-primary">
+    <i class="bi bi-plus-circle me-1"></i>Nueva consulta
+  </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    <table class="table table-clinic mb-0">
+      <thead>
+        <tr>
+          <th>#</th><th>Paciente</th><th>Médico</th><th>Fecha</th>
+          <th>Diagnóstico</th><th class="text-end">Detalle</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in consultas %}
+        <tr>
+          <td class="text-muted small">{{ c.id }}</td>
+          <td class="small fw-semibold">{{ c.paciente.nombre_completo }}</td>
+          <td class="small">Dr. {{ c.medico.nombre_completo }}</td>
+          <td class="small">{{ c.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+          <td class="small">{{ c.diagnostico[:50] }}{% if c.diagnostico|length > 50 %}…{% endif %}</td>
+          <td class="text-end">
+            <a href="{{ url_for('consultas.detalle', id=c.id) }}" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-eye"></i>
+            </a>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-5">
+          <i class="bi bi-clipboard2-x display-6 d-block mb-2 opacity-50"></i>
+          No hay consultas registradas.
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

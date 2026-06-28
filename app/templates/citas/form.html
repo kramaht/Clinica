@@ -1,0 +1,57 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Nueva Cita{% endblock %}
+{% block page_title %}<i class="bi bi-calendar-plus me-2 text-warning"></i>Nueva Cita{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-xl-8">
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <form method="POST">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Paciente *</label>
+          <select name="paciente_id" class="form-select" required>
+            <option value="">Seleccionar paciente…</option>
+            {% for p in pacientes %}
+            <option value="{{ p.id }}" {{ 'selected' if paciente_id == p.id }}>
+              {{ p.nombre_completo }} — CI: {{ p.ci }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Médico *</label>
+          <select name="medico_id" class="form-select" required>
+            <option value="">Seleccionar médico…</option>
+            {% for m in medicos %}
+            <option value="{{ m.id }}">Dr. {{ m.nombre_completo }} — {{ m.especialidad.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Fecha y hora *</label>
+          <input type="datetime-local" name="fecha_hora" class="form-control" required>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Motivo de la cita *</label>
+          <textarea name="motivo" class="form-control" rows="2" required
+                    placeholder="Describa brevemente el motivo de la consulta…"></textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Notas adicionales</label>
+          <textarea name="notas" class="form-control" rows="2"></textarea>
+        </div>
+      </div>
+      <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-clinic-primary px-4">
+          <i class="bi bi-floppy me-1"></i>Agendar cita
+        </button>
+        <a href="{{ url_for('citas.index') }}" class="btn btn-light">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+</div>
+</div>
+{% endblock %}

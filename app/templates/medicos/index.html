@@ -1,0 +1,56 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Médicos{% endblock %}
+{% block page_title %}<i class="bi bi-person-badge me-2" style="color:#0d9488;"></i>Médicos{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-end mb-4">
+  {% if current_user.tiene_rol('admin') %}
+  <a href="{{ url_for('medicos.nuevo') }}" class="btn btn-clinic-primary">
+    <i class="bi bi-person-plus-fill me-1"></i>Nuevo médico
+  </a>
+  {% endif %}
+</div>
+
+<div class="row g-3">
+  {% for m in medicos %}
+  <div class="col-md-6 col-xl-4">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white"
+               style="width:52px;height:52px;font-size:1.1rem;background:#0d9488;flex-shrink:0;">
+            {{ m.usuario.nombre[0] }}{{ m.usuario.apellido[0] }}
+          </div>
+          <div>
+            <div class="fw-bold">Dr. {{ m.nombre_completo }}</div>
+            <div class="text-muted small">{{ m.especialidad.nombre }}</div>
+          </div>
+        </div>
+        <ul class="list-unstyled small mb-3">
+          <li class="py-1 d-flex justify-content-between">
+            <span class="text-muted">Matrícula</span>
+            <strong>{{ m.matricula }}</strong>
+          </li>
+          <li class="py-1 d-flex justify-content-between">
+            <span class="text-muted">Consultorio</span>
+            <strong>{{ m.consultorio or '—' }}</strong>
+          </li>
+          <li class="py-1 d-flex justify-content-between">
+            <span class="text-muted">Teléfono</span>
+            <strong>{{ m.telefono or '—' }}</strong>
+          </li>
+        </ul>
+        <a href="{{ url_for('medicos.detalle', id=m.id) }}" class="btn btn-sm btn-outline-primary w-100">
+          <i class="bi bi-eye me-1"></i>Ver perfil
+        </a>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="col-12 text-center text-muted py-5">
+    <i class="bi bi-person-badge display-5 d-block mb-2 opacity-50"></i>
+    No hay médicos registrados.
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

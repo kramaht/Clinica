@@ -1,0 +1,87 @@
+{% extends 'layouts/base.html' %}
+{% block title %}{{ 'Editar' if paciente else 'Nuevo' }} Paciente{% endblock %}
+{% block page_title %}
+  <i class="bi bi-person-plus me-2 text-primary"></i>
+  {{ 'Editar' if paciente else 'Nuevo' }} Paciente
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-xl-9">
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white border-0 py-3">
+    <h6 class="mb-0 fw-bold">Datos del paciente</h6>
+  </div>
+  <div class="card-body">
+    <form method="POST">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Nombre *</label>
+          <input type="text" name="nombre" class="form-control"
+                 value="{{ paciente.nombre if paciente else '' }}" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Apellido *</label>
+          <input type="text" name="apellido" class="form-control"
+                 value="{{ paciente.apellido if paciente else '' }}" required>
+        </div>
+        {% if not paciente %}
+        <div class="col-md-4">
+          <label class="form-label">CI *</label>
+          <input type="text" name="ci" class="form-control" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Fecha de nacimiento *</label>
+          <input type="date" name="fecha_nacimiento" class="form-control" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Sexo *</label>
+          <select name="sexo" class="form-select" required>
+            <option value="">Seleccionar…</option>
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+          </select>
+        </div>
+        {% endif %}
+        <div class="col-md-6">
+          <label class="form-label">Teléfono</label>
+          <input type="text" name="telefono" class="form-control"
+                 value="{{ paciente.telefono if paciente else '' }}">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Correo electrónico</label>
+          <input type="email" name="email" class="form-control"
+                 value="{{ paciente.email if paciente else '' }}">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Grupo sanguíneo</label>
+          <select name="grupo_sanguineo" class="form-select">
+            <option value="">No especificado</option>
+            {% for g in ['A+','A-','B+','B-','AB+','AB-','O+','O-'] %}
+            <option value="{{ g }}" {{ 'selected' if paciente and paciente.grupo_sanguineo == g }}>{{ g }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Alergias conocidas</label>
+          <input type="text" name="alergias" class="form-control"
+                 value="{{ paciente.alergias if paciente else '' }}"
+                 placeholder="Ej. Penicilina, aspirina…">
+        </div>
+        <div class="col-12">
+          <label class="form-label">Dirección</label>
+          <textarea name="direccion" class="form-control" rows="2">{{ paciente.direccion if paciente else '' }}</textarea>
+        </div>
+      </div>
+      <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-clinic-primary px-4">
+          <i class="bi bi-floppy me-1"></i>{{ 'Actualizar' if paciente else 'Registrar' }}
+        </button>
+        <a href="{{ url_for('pacientes.index') }}" class="btn btn-light">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+</div>
+</div>
+{% endblock %}

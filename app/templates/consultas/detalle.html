@@ -1,0 +1,129 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Consulta #{{ consulta.id }}{% endblock %}
+{% block page_title %}<i class="bi bi-clipboard2-pulse me-2" style="color:#7c3aed;"></i>Consulta #{{ consulta.id }}{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-8">
+    <!-- Datos de la consulta -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-white border-0 py-3">
+        <h6 class="mb-0 fw-bold">Datos clínicos</h6>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="text-muted small">Paciente</div>
+            <div class="fw-semibold">{{ consulta.paciente.nombre_completo }}</div>
+          </div>
+          <div class="col-md-6">
+            <div class="text-muted small">Médico</div>
+            <div class="fw-semibold">Dr. {{ consulta.medico.nombre_completo }}</div>
+          </div>
+          <div class="col-12">
+            <div class="text-muted small">Motivo de consulta</div>
+            <div>{{ consulta.motivo_consulta }}</div>
+          </div>
+          {% if consulta.sintomas %}
+          <div class="col-12">
+            <div class="text-muted small">Síntomas</div>
+            <div>{{ consulta.sintomas }}</div>
+          </div>
+          {% endif %}
+          <div class="col-12">
+            <div class="text-muted small">Diagnóstico</div>
+            <div class="fw-semibold text-primary">{{ consulta.diagnostico }}</div>
+          </div>
+          {% if consulta.tratamiento %}
+          <div class="col-12">
+            <div class="text-muted small">Tratamiento</div>
+            <div>{{ consulta.tratamiento }}</div>
+          </div>
+          {% endif %}
+          {% if consulta.observaciones %}
+          <div class="col-12">
+            <div class="text-muted small">Observaciones</div>
+            <div>{{ consulta.observaciones }}</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Recetas -->
+    {% if recetas %}
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-0 py-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-capsule me-2 text-danger"></i>Receta médica</h6>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-clinic mb-0">
+          <thead>
+            <tr><th>Medicamento</th><th>Dosis</th><th>Frecuencia</th><th>Duración</th><th>Indicaciones</th></tr>
+          </thead>
+          <tbody>
+            {% for r in recetas %}
+            <tr>
+              <td class="fw-semibold small">{{ r.medicamento.nombre }}</td>
+              <td class="small">{{ r.dosis }}</td>
+              <td class="small">{{ r.frecuencia }}</td>
+              <td class="small">{{ r.duracion or '—' }}</td>
+              <td class="small text-muted">{{ r.indicaciones or '—' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Signos vitales -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-0 py-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-heart-pulse me-2 text-danger"></i>Signos vitales</h6>
+      </div>
+      <div class="card-body">
+        <ul class="list-unstyled small">
+          {% if consulta.peso %}
+          <li class="d-flex justify-content-between py-2 border-bottom">
+            <span class="text-muted"><i class="bi bi-person me-1"></i>Peso</span>
+            <strong>{{ consulta.peso }} kg</strong>
+          </li>
+          {% endif %}
+          {% if consulta.talla %}
+          <li class="d-flex justify-content-between py-2 border-bottom">
+            <span class="text-muted"><i class="bi bi-arrows-vertical me-1"></i>Talla</span>
+            <strong>{{ consulta.talla }} cm</strong>
+          </li>
+          {% endif %}
+          {% if consulta.presion_arterial %}
+          <li class="d-flex justify-content-between py-2 border-bottom">
+            <span class="text-muted"><i class="bi bi-heart me-1"></i>Presión arterial</span>
+            <strong>{{ consulta.presion_arterial }} mmHg</strong>
+          </li>
+          {% endif %}
+          {% if consulta.temperatura %}
+          <li class="d-flex justify-content-between py-2 border-bottom">
+            <span class="text-muted"><i class="bi bi-thermometer me-1"></i>Temperatura</span>
+            <strong>{{ consulta.temperatura }} °C</strong>
+          </li>
+          {% endif %}
+          {% if consulta.frecuencia_cardiaca %}
+          <li class="d-flex justify-content-between py-2">
+            <span class="text-muted"><i class="bi bi-activity me-1"></i>Frec. cardíaca</span>
+            <strong>{{ consulta.frecuencia_cardiaca }} lpm</strong>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+    <div class="mt-3">
+      <a href="{{ url_for('pacientes.detalle', id=consulta.paciente_id) }}" class="btn btn-outline-primary w-100">
+        <i class="bi bi-person-circle me-1"></i>Ver historial del paciente
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Dr. {{ medico.nombre_completo }}{% endblock %}
+{% block page_title %}<i class="bi bi-person-badge me-2" style="color:#0d9488;"></i>Dr. {{ medico.nombre_completo }}{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center pt-4">
+        <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center fw-bold text-white mb-3"
+             style="width:72px;height:72px;font-size:1.5rem;background:#0d9488;">
+          {{ medico.usuario.nombre[0] }}{{ medico.usuario.apellido[0] }}
+        </div>
+        <h5 class="fw-bold">Dr. {{ medico.nombre_completo }}</h5>
+        <span class="badge" style="background:#e6f9f6;color:#0d9488;">{{ medico.especialidad.nombre }}</span>
+      </div>
+      <hr class="my-0">
+      <div class="card-body">
+        <ul class="list-unstyled small mb-0">
+          <li class="d-flex justify-content-between py-1"><span class="text-muted">Matrícula</span><strong>{{ medico.matricula }}</strong></li>
+          <li class="d-flex justify-content-between py-1"><span class="text-muted">Consultorio</span><strong>{{ medico.consultorio or '—' }}</strong></li>
+          <li class="d-flex justify-content-between py-1"><span class="text-muted">Teléfono</span><strong>{{ medico.telefono or '—' }}</strong></li>
+          <li class="d-flex justify-content-between py-1"><span class="text-muted">Correo</span><strong>{{ medico.usuario.email }}</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Horarios -->
+    <div class="card border-0 shadow-sm mt-3">
+      <div class="card-header bg-white border-0 py-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-clock me-2 text-warning"></i>Horarios de atención</h6>
+      </div>
+      <div class="card-body p-0">
+        {% for h in horarios %}
+        <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom small">
+          <span class="fw-semibold">{{ h.dia_nombre }}</span>
+          <span class="text-muted">{{ h.hora_inicio.strftime('%H:%M') }} – {{ h.hora_fin.strftime('%H:%M') }}</span>
+          {% if current_user.tiene_rol('admin') or (current_user.medico and current_user.medico.id == medico.id) %}
+          <form method="POST" action="{{ url_for('medicos.eliminar_horario', id=medico.id, hid=h.id) }}">
+            <button class="btn btn-sm btn-link text-danger p-0"><i class="bi bi-x-circle"></i></button>
+          </form>
+          {% endif %}
+        </div>
+        {% else %}
+        <p class="text-muted text-center small py-3">Sin horarios registrados.</p>
+        {% endfor %}
+      </div>
+      {% if current_user.tiene_rol('admin') or (current_user.medico and current_user.medico.id == medico.id) %}
+      <div class="card-footer bg-white border-top">
+        <form method="POST" action="{{ url_for('medicos.agregar_horario', id=medico.id) }}">
+          <div class="row g-2">
+            <div class="col-12">
+              <select name="dia_semana" class="form-select form-select-sm">
+                {% for n, nombre in [(0,'Lunes'),(1,'Martes'),(2,'Miércoles'),(3,'Jueves'),(4,'Viernes'),(5,'Sábado')] %}
+                <option value="{{ n }}">{{ nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-6"><input type="time" name="hora_inicio" class="form-control form-control-sm" value="08:00"></div>
+            <div class="col-6"><input type="time" name="hora_fin" class="form-control form-control-sm" value="12:00"></div>
+            <div class="col-12">
+              <button class="btn btn-sm btn-outline-success w-100"><i class="bi bi-plus-circle me-1"></i>Agregar horario</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Citas -->
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-0 py-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-calendar2 me-2 text-primary"></i>Citas recientes</h6>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-clinic mb-0">
+          <thead><tr><th>Paciente</th><th>Fecha/Hora</th><th>Motivo</th><th>Estado</th></tr></thead>
+          <tbody>
+            {% for c in citas %}
+            <tr>
+              <td class="small fw-semibold">{{ c.paciente.nombre_completo }}</td>
+              <td class="small">{{ c.fecha_hora.strftime('%d/%m/%Y %H:%M') }}</td>
+              <td class="small">{{ c.motivo[:35] }}{% if c.motivo|length > 35 %}…{% endif %}</td>
+              <td><span class="badge bg-{{ c.badge_color }} bg-opacity-15 text-{{ c.badge_color }}">{{ c.estado }}</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-center text-muted py-4 small">Sin citas registradas.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

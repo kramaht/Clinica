@@ -1,0 +1,121 @@
+{% extends 'layouts/base.html' %}
+{% block title %}{{ paciente.nombre_completo }}{% endblock %}
+{% block page_title %}
+  <i class="bi bi-person-circle me-2 text-primary"></i>{{ paciente.nombre_completo }}
+{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+  <!-- Info del paciente -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center pt-4">
+        <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center fw-bold text-white mb-3"
+             style="width:72px;height:72px;font-size:1.5rem;
+                    background:{{ '#1a6fb5' if paciente.sexo == 'M' else '#0d9488' }};">
+          {{ paciente.nombre[0] }}{{ paciente.apellido[0] }}
+        </div>
+        <h5 class="fw-bold mb-0">{{ paciente.nombre_completo }}</h5>
+        <p class="text-muted small mb-2">CI: {{ paciente.ci }}</p>
+        <span class="badge {{ 'bg-primary' if paciente.sexo == 'M' else 'bg-success' }}">
+          {{ 'Masculino' if paciente.sexo == 'M' else 'Femenino' }}
+        </span>
+        {% if paciente.grupo_sanguineo %}
+        <span class="badge bg-danger ms-1">{{ paciente.grupo_sanguineo }}</span>
+        {% endif %}
+      </div>
+      <hr class="my-0">
+      <div class="card-body">
+        <ul class="list-unstyled small mb-0">
+          <li class="d-flex justify-content-between py-1">
+            <span class="text-muted">Edad</span>
+            <strong>{{ paciente.edad }} años</strong>
+          </li>
+          <li class="d-flex justify-content-between py-1">
+            <span class="text-muted">Nacimiento</span>
+            <strong>{{ paciente.fecha_nacimiento.strftime('%d/%m/%Y') }}</strong>
+          </li>
+          <li class="d-flex justify-content-between py-1">
+            <span class="text-muted">Teléfono</span>
+            <strong>{{ paciente.telefono or '—' }}</strong>
+          </li>
+          <li class="d-flex justify-content-between py-1">
+            <span class="text-muted">Correo</span>
+            <strong>{{ paciente.email or '—' }}</strong>
+          </li>
+          {% if paciente.alergias %}
+          <li class="py-1">
+            <span class="text-muted d-block">Alergias</span>
+            <span class="badge bg-danger bg-opacity-15 text-danger mt-1">{{ paciente.alergias }}</span>
+          </li>
+          {% endif %}
+        </ul>
+        <div class="d-grid gap-2 mt-3">
+          <a href="{{ url_for('pacientes.editar', id=paciente.id) }}" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-pencil me-1"></i>Editar datos
+          </a>
+          <a href="{{ url_for('citas.nueva') }}?paciente_id={{ paciente.id }}" class="btn btn-sm btn-clinic-primary">
+            <i class="bi bi-calendar-plus me-1"></i>Nueva cita
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historial -->
+  <div class="col-lg-8">
+    <!-- Últimas citas -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-calendar2 me-2 text-warning"></i>Citas recientes</h6>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-clinic mb-0">
+          <thead><tr><th>Fecha/Hora</th><th>Médico</th><th>Motivo</th><th>Estado</th></tr></thead>
+          <tbody>
+            {% for cita in citas %}
+            <tr>
+              <td class="small">{{ cita.fecha_hora.strftime('%d/%m/%Y %H:%M') }}</td>
+              <td class="small">Dr. {{ cita.medico.nombre_completo }}</td>
+              <td class="small">{{ cita.motivo[:40] }}{% if cita.motivo|length > 40 %}…{% endif %}</td>
+              <td><span class="badge bg-{{ cita.badge_color }} bg-opacity-15 text-{{ cita.badge_color }}">{{ cita.estado }}</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-center text-muted py-3 small">Sin citas registradas.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Historial de consultas -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-0 py-3">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-clipboard2-pulse me-2 text-purple" style="color:#7c3aed;"></i>Historial clínico</h6>
+      </div>
+      <div class="card-body">
+        {% for c in consultas %}
+        <div class="border rounded-3 p-3 mb-3">
+          <div class="d-flex justify-content-between mb-2">
+            <span class="small fw-bold text-primary">{{ c.fecha.strftime('%d/%m/%Y %H:%M') }}</span>
+            <span class="small text-muted">Dr. {{ c.medico.nombre_completo }}</span>
+          </div>
+          <p class="small mb-1"><strong>Motivo:</strong> {{ c.motivo_consulta }}</p>
+          <p class="small mb-1"><strong>Diagnóstico:</strong> {{ c.diagnostico }}</p>
+          {% if c.tratamiento %}
+          <p class="small mb-0"><strong>Tratamiento:</strong> {{ c.tratamiento }}</p>
+          {% endif %}
+          <div class="d-flex flex-wrap gap-2 mt-2">
+            {% if c.presion_arterial %}<span class="badge bg-light text-dark border"><i class="bi bi-heart me-1"></i>{{ c.presion_arterial }}</span>{% endif %}
+            {% if c.temperatura %}<span class="badge bg-light text-dark border"><i class="bi bi-thermometer me-1"></i>{{ c.temperatura }}°C</span>{% endif %}
+            {% if c.peso %}<span class="badge bg-light text-dark border">{{ c.peso }} kg</span>{% endif %}
+          </div>
+        </div>
+        {% else %}
+        <p class="text-muted text-center py-3 small">Sin consultas registradas.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
