@@ -15,7 +15,7 @@ instance/
 *.sqlite3
 *.db
 
-config.py
+
 .env
 
 *.log
